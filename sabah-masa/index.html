@@ -1086,6 +1086,38 @@
     </div>
   </article>
 
+  <div class="divider"></div>
+
+  <!-- ١٦ — أعوذ بكلمات الله التامات × ٣ -->
+  <article class="wird-card" id="sm16" data-timing="both">
+    <div class="card-header">
+      <div class="hadith-badge">أعوذ بكلمات الله التامات</div>
+      <span class="timing-badge">صباحاً ومساءً × ٣</span>
+    </div>
+    <div class="wird-text tappable" onclick="tapCounter('sm16')">
+      «أَعُوذُ بِكَلِمَاتِ اللَّهِ التَّامَّاتِ مِنْ شَرِّ مَا خَلَقَ»
+    </div>
+    <div class="wird-ref">
+      <strong>الراوي:</strong> أبو هريرة رضي الله عنه — أن النبيَّ ﷺ قال:
+      «مَنْ نَزَلَ مَنْزِلًا فَقَالَ: أَعُوذُ بِكَلِمَاتِ اللَّهِ التَّامَّاتِ مِنْ شَرِّ مَا خَلَقَ؛ لَمْ يَضُرَّهُ شَيْءٌ حَتَّى يَرْتَحِلَ مِنْ مَنْزِلِهِ ذَلِكَ»<br>
+      <strong>المصدر:</strong> رواه مسلم (2708)<br>
+      <span class="auth-badge">حديث صحيح</span>
+    </div>
+    <div class="counter-area">
+      <button class="counter-reset" onclick="resetCounter('sm16')" aria-label="إعادة تعيين">↺</button>
+      <div class="progress-wrapper" onclick="tapCounter('sm16')"
+           role="progressbar" aria-valuemin="0" aria-valuemax="3" aria-valuenow="0">
+        <div class="progress-track"><div class="progress-fill" id="fill-sm16"></div></div>
+        <div class="progress-info">
+          <span class="counter-num" id="count-sm16">٠</span>
+          <span class="progress-sep">/</span>
+          <span class="counter-max-label">٣</span>
+        </div>
+      </div>
+      <button class="counter-tap" onclick="tapCounter('sm16')" aria-label="تسبيح">اضغط للعدّ</button>
+    </div>
+  </article>
+
 </main>
 
 <footer class="site-footer">أذكار الصباح والمساء · من هدي النبي ﷺ المأثور</footer>
@@ -1100,7 +1132,8 @@ const ADHKAR_MAX = {
   sm1: 1, sm2: 1, sm3: 1, sm4: 10,
   sm5: 1, sm6: 3, sm7: 3, sm8: 3,
   sm9: 7, sm10: 100, sm11: 1, sm12: 1,
-  sm13: 3, sm14: 3, sm15: 3
+  sm13: 3, sm14: 3, sm15: 3,
+  sm16: 3
 };
 function getMax(id) { return ADHKAR_MAX[id] || 1; }
 
@@ -1246,6 +1279,34 @@ restorePrefs();
 applyFont();
 applyTheme();
 setFilter('morning');
+
+// ──────────────────────────────────
+// FULL CARD TAP — entire card is tappable
+// ──────────────────────────────────
+(function () {
+  document.querySelectorAll('.wird-card').forEach(function (card) {
+    var id = card.id;
+    if (!id) return;
+    card.style.cursor = 'pointer';
+    // Entire card counts — skip only the reset button
+    card.addEventListener('click', function (e) {
+      if (e.target.closest('.counter-reset')) return;
+      tapCounter(id);
+    });
+    // Remove inner onclick duplicates to prevent double-counting
+    card.querySelectorAll('.tappable, .progress-wrapper').forEach(function (el) {
+      el.onclick = null;
+    });
+    // Counter-tap button: stop propagation so card fires only once
+    card.querySelectorAll('.counter-tap').forEach(function (btn) {
+      btn.onclick = null;
+      btn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        tapCounter(id);
+      });
+    });
+  });
+}());
 </script>
 </body>
 </html>

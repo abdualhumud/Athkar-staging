@@ -1003,6 +1003,37 @@ restorePrefs();
 renderCards();
 applyFont();
 applyTheme();
+
+// ──────────────────────────────────
+// FULL CARD TAP — entire card is tappable
+// ──────────────────────────────────
+(function () {
+  document.querySelectorAll('.dua-card').forEach(function (card) {
+    // card.id = "dua-N"; tapCounter expects the numeric N
+    var raw = card.id;
+    if (!raw) return;
+    var id = parseInt(raw.replace('dua-', ''), 10);
+    if (isNaN(id)) return;
+    card.style.cursor = 'pointer';
+    // Entire card counts — skip only the reset button
+    card.addEventListener('click', function (e) {
+      if (e.target.closest('.counter-reset')) return;
+      tapCounter(id);
+    });
+    // Remove inner onclick duplicates to prevent double-counting
+    card.querySelectorAll('.tappable, .progress-wrapper').forEach(function (el) {
+      el.onclick = null;
+    });
+    // Counter-tap button: stop propagation so card fires only once
+    card.querySelectorAll('.counter-tap').forEach(function (btn) {
+      btn.onclick = null;
+      btn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        tapCounter(id);
+      });
+    });
+  });
+}());
 </script>
 </body>
 </html>

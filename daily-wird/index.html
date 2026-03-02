@@ -692,17 +692,18 @@
     <div class="wird-ref">
       <strong>الراوي:</strong> أبو هريرة رضي الله عنه — أن النبيَّ ﷺ قال:
       «مَنْ نَزَلَ مَنْزِلًا فَقَالَ: أَعُوذُ بِكَلِمَاتِ اللَّهِ التَّامَّاتِ مِنْ شَرِّ مَا خَلَقَ؛ لَمْ يَضُرَّهُ شَيْءٌ حَتَّى يَرْتَحِلَ مِنْ مَنْزِلِهِ ذَلِكَ»<br>
-      <strong>المصدر:</strong> رواه مسلم (2708)
+      <strong>المصدر:</strong> رواه مسلم (2708)<br>
+      <span class="auth-badge">حديث صحيح</span>
     </div>
     <div class="counter-area">
       <button class="counter-reset" onclick="resetCounter('w5')" aria-label="إعادة تعيين">↺</button>
       <div class="progress-wrapper" onclick="tapCounter('w5')"
-           role="progressbar" aria-valuemin="0" aria-valuemax="1" aria-valuenow="0">
+           role="progressbar" aria-valuemin="0" aria-valuemax="3" aria-valuenow="0">
         <div class="progress-track"><div class="progress-fill" id="fill-w5"></div></div>
         <div class="progress-info">
           <span class="counter-num" id="count-w5">٠</span>
           <span class="progress-sep">/</span>
-          <span class="counter-max-label">١</span>
+          <span class="counter-max-label">٣</span>
         </div>
       </div>
       <button class="counter-tap" onclick="tapCounter('w5')" aria-label="تسبيح">اضغط للعدّ</button>
@@ -780,7 +781,7 @@
 // COUNTER
 // ──────────────────────────────────
 const counters = {};
-const ADHKAR_MAX = { w1: 1, w2: 3, w3: 3, w4: 3, w5: 1, w6: 3, w7: 33 };
+const ADHKAR_MAX = { w1: 1, w2: 3, w3: 3, w4: 3, w5: 3, w6: 3, w7: 33 };
 
 function getMax(id) { return ADHKAR_MAX[id] || 1; }
 
@@ -893,6 +894,34 @@ if (savedTheme === 'dark') { isDark = true; }
 
 applyFont();
 applyTheme();
+
+// ──────────────────────────────────
+// FULL CARD TAP — entire card is tappable
+// ──────────────────────────────────
+(function () {
+  document.querySelectorAll('.wird-card').forEach(function (card) {
+    var id = card.id;
+    if (!id) return;
+    card.style.cursor = 'pointer';
+    // Entire card counts — skip only the reset button
+    card.addEventListener('click', function (e) {
+      if (e.target.closest('.counter-reset')) return;
+      tapCounter(id);
+    });
+    // Remove inner onclick duplicates to prevent double-counting
+    card.querySelectorAll('.tappable, .progress-wrapper').forEach(function (el) {
+      el.onclick = null;
+    });
+    // Counter-tap button: stop propagation so card fires only once
+    card.querySelectorAll('.counter-tap').forEach(function (btn) {
+      btn.onclick = null;
+      btn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        tapCounter(id);
+      });
+    });
+  });
+}());
 </script>
 </body>
 </html>
