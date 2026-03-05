@@ -875,12 +875,10 @@ function renderCards() {
       <div class="counter-area">
         <button class="counter-reset" onclick="resetCounter(${dua.id})" aria-label="إعادة تعيين">↺</button>
         <div class="progress-wrapper" onclick="tapCounter(${dua.id})"
-             role="progressbar" aria-valuemin="0" aria-valuemax="3" aria-valuenow="0">
+             role="progressbar" aria-valuemin="0" aria-valuemax="9999" aria-valuenow="0">
           <div class="progress-track"><div class="progress-fill" id="fill-${dua.id}"></div></div>
           <div class="progress-info">
             <span class="counter-num" id="count-${dua.id}">٠</span>
-            <span class="progress-sep">/</span>
-            <span class="counter-max-label">٣</span>
           </div>
         </div>
         <button class="counter-tap" onclick="tapCounter(${dua.id})" aria-label="تسبيح">اضغط للعدّ</button>
@@ -898,10 +896,7 @@ function renderCards() {
 // ─────────────────────────────────────────
 // COUNTER
 // ─────────────────────────────────────────
-const DUA_MAX = 3;
-
 function tapCounter(id) {
-  if (counters[id] >= DUA_MAX) return;
   counters[id]++;
   updateCountDisplay(id);
 }
@@ -913,9 +908,8 @@ function updateCountDisplay(id) {
   const wrap  = fill && fill.closest('[role="progressbar"]');
   if (el)   el.textContent = toArabicNum(count);
   if (fill) {
-    const pct = Math.min((count / DUA_MAX) * 100, 100);
-    fill.style.width = pct + '%';
-    fill.classList.toggle('done', count >= DUA_MAX);
+    fill.style.width = count > 0 ? '100%' : '0%';
+    fill.classList.toggle('done', count > 0);
   }
   if (wrap) wrap.setAttribute('aria-valuenow', count);
 }
