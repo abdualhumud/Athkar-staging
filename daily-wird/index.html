@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta http-equiv="Content-Security-Policy"
-        content="default-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; script-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https://fonts.googleapis.com https://fonts.gstatic.com; manifest-src 'self'; object-src 'none'; base-uri 'self';" />
+        content="default-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; script-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https://fonts.googleapis.com https://fonts.gstatic.com https://*.workers.dev; manifest-src 'self'; object-src 'none'; base-uri 'self';" />
   <meta name="referrer" content="no-referrer" />
   <meta http-equiv="X-Content-Type-Options" content="nosniff" />
   <title>الورد اليومي</title>
@@ -529,6 +529,80 @@
     @media (max-width: 400px) {
       .wird-card { padding: 18px 14px 16px; }
     }
+
+    /* ── Subscribe section ───────────────────────────────────────────────── */
+    .subscribe-section {
+      background: var(--card);
+      border-top: 1px solid var(--border);
+      padding: 28px 16px;
+      text-align: center;
+    }
+    .subscribe-inner { max-width: 420px; margin: 0 auto; }
+    .subscribe-title {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--accent);
+      margin: 0 0 6px;
+    }
+    .subscribe-desc {
+      font-size: 0.82rem;
+      color: var(--muted);
+      margin: 0 0 14px;
+    }
+    .subscribe-form {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .subscribe-form input[type="tel"] {
+      background: var(--bg);
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 14px;
+      font-family: inherit;
+      font-size: 0.95rem;
+      color: var(--text);
+      width: 100%;
+      box-sizing: border-box;
+      text-align: left;
+    }
+    .subscribe-form input[type="tel"]:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+    .consent-label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.8rem;
+      color: var(--muted);
+      cursor: pointer;
+    }
+    .consent-label input[type="checkbox"] {
+      width: 16px;
+      height: 16px;
+      accent-color: var(--accent);
+      flex-shrink: 0;
+    }
+    .subscribe-btn {
+      background: var(--accent);
+      color: var(--header-fg);
+      border: none;
+      border-radius: 10px;
+      padding: 11px 20px;
+      font-family: inherit;
+      font-size: 0.95rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: opacity 0.15s;
+      touch-action: manipulation;
+    }
+    .subscribe-btn:disabled { opacity: 0.6; cursor: default; }
+    .subscribe-btn:not(:disabled):active { opacity: 0.8; }
+    .subscribe-note { margin: 10px 0 0; font-size: 0.82rem; min-height: 1.2em; }
+    .subscribe-note.success { color: var(--accent); }
+    .subscribe-note.error   { color: #c0392b; }
+
   </style>
 </head>
 <body>
@@ -808,6 +882,24 @@
 
 </main>
 
+<section class="subscribe-section" aria-label="الاشتراك في التذكير اليومي">
+  <div class="subscribe-inner">
+    <p class="subscribe-title">📲 تذكير يومي عبر واتساب</p>
+    <p class="subscribe-desc">اشترك لتصلك أذكار الصباح والمساء يومياً</p>
+    <form class="subscribe-form" id="subscribe-form" novalidate>
+      <input type="tel" id="subscribe-phone"
+             placeholder="+966501234567"
+             dir="ltr" inputmode="tel" autocomplete="tel" />
+      <label class="consent-label">
+        <input type="checkbox" id="subscribe-consent" />
+        <span>أوافق على استلام رسائل تذكير يومية</span>
+      </label>
+      <button type="submit" class="subscribe-btn">اشترك مجاناً</button>
+    </form>
+    <p class="subscribe-note" id="subscribe-msg"></p>
+  </div>
+</section>
+
 <footer class="site-footer">الورد اليومي · من جوامع دعاء النبي ﷺ</footer>
 
 <button id="back-top" aria-label="العودة للأعلى">↑</button>
@@ -1009,6 +1101,64 @@ window.addEventListener('appinstalled', function() {
   deferredPrompt = null;
   if (installBtn) installBtn.classList.remove('show');
 });
+
+// ──────────────────────────────────
+// SUBSCRIBE FORM
+// ──────────────────────────────────
+(function () {
+  // ⚠ After deploying the Worker, replace ACCOUNT with your Cloudflare subdomain
+  var WORKER_URL = 'https://athkar-reminders.ACCOUNT.workers.dev';
+
+  var form = document.getElementById('subscribe-form');
+  var msg  = document.getElementById('subscribe-msg');
+  if (!form) return;
+
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    var phone   = (document.getElementById('subscribe-phone').value || '').trim();
+    var consent = document.getElementById('subscribe-consent').checked;
+
+    if (!phone.match(/^\+\d{7,15}$/)) {
+      showMsg('أدخل رقم واتساب صحيح مع رمز الدولة (مثال: +966501234567)', 'error');
+      return;
+    }
+    if (!consent) {
+      showMsg('يرجى الموافقة على استلام الرسائل', 'error');
+      return;
+    }
+
+    var btn = form.querySelector('.subscribe-btn');
+    btn.disabled    = true;
+    btn.textContent = 'جاري الاشتراك…';
+
+    fetch(WORKER_URL + '/api/subscribe', {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify({ phone: phone, consent: true }),
+    })
+    .then(function (r) { return r.json(); })
+    .then(function (data) {
+      if (data.status === 'subscribed' || data.status === 'already_subscribed') {
+        showMsg('✅ تم الاشتراك! ستصلك رسائل التذكير يومياً', 'success');
+        form.reset();
+      } else {
+        showMsg('حدث خطأ، تأكد من الرقم وأعد المحاولة', 'error');
+      }
+    })
+    .catch(function () {
+      showMsg('تعذّر الاتصال، أعد المحاولة لاحقاً', 'error');
+    })
+    .finally(function () {
+      btn.disabled    = false;
+      btn.textContent = 'اشترك مجاناً';
+    });
+  });
+
+  function showMsg(text, type) {
+    msg.textContent = text;
+    msg.className   = 'subscribe-note ' + type;
+  }
+}());
 </script>
 </body>
 </html>

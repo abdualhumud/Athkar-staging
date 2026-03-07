@@ -1,0 +1,22 @@
+name = "athkar-reminders"
+main = "src/worker.js"
+compatibility_date = "2024-11-01"
+
+# ── Cron triggers ─────────────────────────────────────────────────────────────
+# 04:00 UTC = 07:00 AM Riyadh (AST / UTC+3) → Morning adhkar
+# 13:00 UTC = 04:00 PM Riyadh (AST / UTC+3) → Evening adhkar
+[triggers]
+crons = ["0 4 * * *", "0 13 * * *"]
+
+# ── KV Namespace ──────────────────────────────────────────────────────────────
+# After running: wrangler kv:namespace create SUBSCRIBERS
+# Paste the returned id below
+[[kv_namespaces]]
+binding = "SUBSCRIBERS"
+id = "REPLACE_WITH_YOUR_KV_NAMESPACE_ID"
+
+# ── Secrets (set via CLI — never commit) ─────────────────────────────────────
+# wrangler secret put WHATSAPP_TOKEN        ← Meta permanent system user token
+# wrangler secret put WHATSAPP_PHONE_ID     ← Meta Phone Number ID
+# wrangler secret put WEBHOOK_VERIFY_TOKEN  ← Any random string
+# wrangler secret put ALLOWED_ORIGIN        ← https://staging.athkarr.com (staging) or https://athkarr.com (production)
