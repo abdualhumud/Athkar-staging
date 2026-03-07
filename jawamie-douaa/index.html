@@ -4,12 +4,17 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta http-equiv="Content-Security-Policy"
-        content="default-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; script-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'self';" />
+        content="default-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; script-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https://fonts.googleapis.com https://fonts.gstatic.com; manifest-src 'self'; object-src 'none'; base-uri 'self';" />
   <meta name="referrer" content="no-referrer" />
   <meta http-equiv="X-Content-Type-Options" content="nosniff" />
   <title>من جوامع دعاء النبي ﷺ</title>
   <meta name="description" content="٥٠ دعاءً جامعاً مأثوراً من هدي النبي ﷺ — مجموعة شاملة من جوامع الدعاء النبوي المأثور" />
   <link rel="canonical" href="https://athkarr.com/" />
+  <link rel="manifest" href="/manifest.json" />
+  <meta name="theme-color" content="#7A5C3E" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <link rel="apple-touch-icon" href="/icons/icon-192.png" />
   <script>try{if(localStorage.getItem("athkar-theme")==="dark")document.documentElement.setAttribute("data-theme","dark")}catch(e){}</script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -154,6 +159,26 @@
       flex-shrink: 0;
     }
     .theme-toggle:active { background: rgba(255,255,255,0.30); }
+
+    /* PWA install button */
+    .install-btn {
+      background: transparent;
+      border: none;
+      color: var(--header-fg);
+      border-radius: 8px;
+      width: 44px;
+      height: 44px;
+      font-size: 1.2rem;
+      cursor: pointer;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      touch-action: manipulation;
+      transition: background 0.15s;
+      flex-shrink: 0;
+    }
+    .install-btn.show { display: flex; }
+    .install-btn:active { background: rgba(255,255,255,0.30); }
 
     /* Row 2: Wird button aligned left (RTL flex-end) */
     .header-bottom {
@@ -454,6 +479,7 @@
       <span class="font-size-label" id="font-label">متوسط</span>
       <button class="font-btn" id="font-up"   aria-label="تكبير الخط">أ+</button>
     </div>
+    <button class="install-btn" id="install-btn" aria-label="تثبيت التطبيق" title="أضف للشاشة الرئيسية">📲</button>
     <button class="theme-toggle" id="theme-toggle" aria-label="تبديل المظهر" title="ليلي / نهاري">🌙</button>
   </div>
 
@@ -1029,6 +1055,38 @@ applyTheme();
     });
   });
 }());
+
+// ──────────────────────────────────
+// SERVICE WORKER
+// ──────────────────────────────────
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/sw.js').catch(function() {});
+}
+
+// ──────────────────────────────────
+// PWA INSTALL PROMPT
+// ──────────────────────────────────
+var deferredPrompt = null;
+var installBtn = document.getElementById('install-btn');
+window.addEventListener('beforeinstallprompt', function(e) {
+  e.preventDefault();
+  deferredPrompt = e;
+  if (installBtn) installBtn.classList.add('show');
+});
+if (installBtn) {
+  installBtn.addEventListener('click', function() {
+    if (!deferredPrompt) return;
+    deferredPrompt.prompt();
+    deferredPrompt.userChoice.then(function() {
+      deferredPrompt = null;
+      installBtn.classList.remove('show');
+    });
+  });
+}
+window.addEventListener('appinstalled', function() {
+  deferredPrompt = null;
+  if (installBtn) installBtn.classList.remove('show');
+});
 </script>
 </body>
 </html>
