@@ -13,7 +13,7 @@ crons = ["0 4 * * *", "0 13 * * *"]
 # Paste the returned id below
 [[kv_namespaces]]
 binding = "SUBSCRIBERS"
-id = "REPLACE_WITH_YOUR_KV_NAMESPACE_ID"
+id = "84e57d17e41140f18209f5c2738b89af"
 
 # ── Secrets (set via CLI — never commit) ─────────────────────────────────────
 # wrangler secret put WHATSAPP_TOKEN        ← Meta permanent system user token
