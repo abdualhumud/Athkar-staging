@@ -391,12 +391,13 @@ If `index.lock` error appears: find and remove stale lock with `find /c/Users/..
 
 ### Meta Business Account Restriction
 - **Business:** Athkarr — Business ID `1587575539115708`
-- **Status:** ⚠️ RESTRICTED (as of 2026-03-12)
+- **Status:** ❌ RESTRICTED — appeal **DENIED** (2026-03-12)
 - **Reason:** Meta flagged account for "automation that doesn't follow Advertising Standards on Account Integrity"
 - **Root cause:** Likely triggered by the Cloudflare Worker sending WhatsApp messages programmatically
 - **Impact:** Cannot create System Users, cannot generate permanent tokens, cannot create/run ads
-- **Appeal:** Click "Request review" in Meta Business Manager → explain Athkarr is a non-commercial Islamic adhkar service using the WhatsApp Business API legitimately
-- **Review ETA:** 4–7 business days from appeal submission
+- **Appeal result:** Review completed and denied on 2026-03-12. No live support channel available for Account Integrity restrictions.
+- **Next steps:** Option A — create a new Meta Business Account and start fresh. Option B — wait and try re-appealing via Business Manager "Request review" after a cooling-off period.
+- **Note:** No live chat available for this restriction type — all Meta support paths lead to automated review.
 
 ### WhatsApp Templates (Pending Approval)
 - `adhkar_sabah` — Morning adhkar reminder template — **PENDING**
@@ -407,6 +408,40 @@ If `index.lock` error appears: find and remove stale lock with `find /c/Users/..
 - Phone input: `type="tel"`, `inputmode="tel"`, `autocomplete="tel"`, `name="phone"`
 - Validation: strips leading zeros, validates 7–15 digits internationally
 - `handleSubscribe()` reads country code dynamically from `#sub-country` — never hardcode +966
+
+---
+
+---
+
+## Production Features Deployed (2026-03-12)
+
+Two features were surgically extracted from staging and deployed to all four production pages:
+
+### 1. WhatsApp Share Button (📤)
+- Appears in `.header-icons` group alongside the theme toggle
+- Each page shares its own canonical URL:
+  - `index.html` / `jawamie-douaa/index.html` → `https://athkarr.com/jawamie-douaa/`
+  - `daily-wird/index.html` → `https://athkarr.com/daily-wird/`
+  - `sabah-masa/index.html` → `https://athkarr.com/sabah-masa/`
+- Uses `navigator.share()` with fallback to `https://wa.me/?text=...`
+- **Share-only** — NOT connected to the subscription/notification system
+
+### 2. Add to Home Screen / PWA Install (📲)
+- `manifest.json` created at root with `start_url: "/"`, `theme_color: "#7A5C3E"`, `lang: "ar"`, `dir: "rtl"`
+- `icon.svg` used as the only icon (`purpose: "any"`, `sizes: "any"`)
+- PWA meta tags added to all 4 pages (`<head>`):
+  - `<link rel="manifest" href="/manifest.json" />`
+  - `mobile-web-app-capable`, `apple-mobile-web-app-capable`
+  - `apple-mobile-web-app-title` = "أذكار"
+  - `apple-touch-icon` → `/icon.svg`
+- Install button hidden by default, shown only when `beforeinstallprompt` fires (Android) or on iOS
+- 5-step iOS A2HS guide overlay with Arabic instructions and SVG illustrations
+- `sw.js` = **kill switch** (user-intentional) — clears all caches and unregisters itself on activation
+
+### STRICTLY NOT in Production
+- WhatsApp notification subscription popup
+- Phone number collection or Cloudflare Worker calls
+- Any staging-only features (noindex, staging CNAME, subscription UI)
 
 ---
 
