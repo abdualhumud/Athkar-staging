@@ -1,6 +1,6 @@
 // Athkar Service Worker — Staging
 // Network-first for HTML, cache-first for assets
-const CACHE = 'athkar-v3';
+const CACHE = 'athkar-v4';
 const ASSETS = [
   '/',
   '/index.html',
@@ -10,6 +10,8 @@ const ASSETS = [
   '/daily-wird/index.html',
   '/sabah-masa/',
   '/sabah-masa/index.html',
+  '/mazeed/',
+  '/mazeed/index.html',
   '/404.html',
   '/manifest.json',
   '/icon.svg'
