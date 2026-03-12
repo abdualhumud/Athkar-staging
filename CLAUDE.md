@@ -372,3 +372,17 @@ git checkout claude/great-rosalind
 ```
 
 If `index.lock` error appears: find and remove stale lock with `find /c/Users/... -name "*.lock"`.
+
+### Known Staging Rebase Conflict — Header (d65a4c4)
+
+Staging overlay commit `d65a4c4` ("Fix header layout") explicitly introduces
+`href="/daily-wird/"` in its diff. When rebased on top of any commit that
+already has `/sabah-masa/`, this causes a conflict or duplicate `header-bottom`.
+
+**Resolution**: staging commit `1776edb` ("Fix: remove duplicate header-bottom")
+is a permanent staging overlay that applies AFTER `d65a4c4` and removes the
+duplicate, ensuring only one `header-bottom` with `/sabah-masa/` remains.
+On future rebases this pair of commits will always conflict+clean correctly.
+
+If the conflict appears again during rebase, resolve by keeping HEAD (which has
+`/sabah-masa/`) — the fix commit `1776edb` will clean up the duplicate afterward.
