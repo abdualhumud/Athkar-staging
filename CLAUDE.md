@@ -458,6 +458,43 @@ git checkout claude/great-rosalind
 
 If `index.lock` error appears: find and remove stale lock with `find /c/Users/... -name "*.lock"`.
 
+---
+
+## WhatsApp Reminders Infrastructure
+
+### Cloudflare Worker
+- **URL:** `https://athkar-reminders.ngd739.workers.dev`
+- **Repo path:** `cloudflare-worker/`
+- **API endpoint:** `POST /api/subscribe` — body `{ phone, consent: true }`
+- Token stored in Cloudflare Worker secret `WHATSAPP_TOKEN`
+
+### Token Status — CRITICAL
+- **Permanent System User token:** ❌ BLOCKED — cannot create until Meta business review clears
+- **Temporary token:** Expires every ~24 hours — must be refreshed manually
+- **How to refresh:** WhatsApp API Setup page → copy temporary token → update `WHATSAPP_TOKEN` secret in Cloudflare Worker dashboard
+- **Permanent fix:** Once Meta review clears → create System User → generate non-expiring token
+
+### Meta Business Account Restriction
+- **Business:** Athkarr — Business ID `1587575539115708`
+- **Status:** ⚠️ RESTRICTED (as of 2026-03-12)
+- **Reason:** Meta flagged account for "automation that doesn't follow Advertising Standards on Account Integrity"
+- **Root cause:** Likely triggered by the Cloudflare Worker sending WhatsApp messages programmatically
+- **Impact:** Cannot create System Users, cannot generate permanent tokens, cannot create/run ads
+- **Appeal:** Click "Request review" in Meta Business Manager → explain Athkarr is a non-commercial Islamic adhkar service using the WhatsApp Business API legitimately
+- **Review ETA:** 4–7 business days from appeal submission
+
+### WhatsApp Templates (Pending Approval)
+- `adhkar_sabah` — Morning adhkar reminder template — **PENDING**
+- `adhkar_masa` — Evening adhkar reminder template — **PENDING**
+
+### Subscription Popup (Staging Only)
+- Country code selector `#sub-country` — 15 countries, default Saudi Arabia (+966)
+- Phone input: `type="tel"`, `inputmode="tel"`, `autocomplete="tel"`, `name="phone"`
+- Validation: strips leading zeros, validates 7–15 digits internationally
+- `handleSubscribe()` reads country code dynamically from `#sub-country` — never hardcode +966
+
+---
+
 ### Known Staging Rebase Conflict — Header (d65a4c4)
 
 Staging overlay commit `d65a4c4` ("Fix header layout") explicitly introduces `href="/daily-wird/"` in its diff. When rebased on top of any commit that already has `/sabah-masa/`, this causes a conflict or duplicate `header-bottom`.
