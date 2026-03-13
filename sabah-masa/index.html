@@ -97,6 +97,13 @@
       gap: 6px;
       flex-wrap: nowrap;
     }
+    /* Row 2: font controls left-aligned (RTL flex-end) */
+    .header-bottom {
+      margin-top: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+    }
     /* ─── Grouped icon buttons ─── */
     .header-icons {
       display: flex;
@@ -726,11 +733,6 @@
                 onclick="setPillTheme(true)"  title="ليلي"  aria-label="الوضع الليلي"></button>
       </div>
     </div>
-    <div class="font-controls">
-      <button class="font-btn" id="font-down" aria-label="تصغير الخط">أ−</button>
-      <span class="font-size-label" id="font-label">متوسط</span>
-      <button class="font-btn" id="font-up"   aria-label="تكبير الخط">أ+</button>
-    </div>
     <div class="header-icons">
       <button class="theme-toggle" id="theme-toggle" aria-label="تبديل المظهر" title="ليلي / نهاري">🌙</button>
       <button class="wa-share-btn" id="wa-share-btn" onclick="shareWhatsApp()" aria-label="مشاركة عبر واتساب" title="مشاركة">
@@ -739,6 +741,14 @@
         </svg>
       </button>
       <button class="pwa-install-btn" id="pwa-install-btn" onclick="handlePWAInstall()" aria-label="إضافة للشاشة الرئيسية" title="إضافة للشاشة الرئيسية">📲</button>
+    </div>
+  </div>
+  <!-- Row 2: font controls left-aligned (RTL flex-end) -->
+  <div class="header-bottom">
+    <div class="font-controls">
+      <button class="font-btn" id="font-down" aria-label="تصغير الخط">أ−</button>
+      <span class="font-size-label" id="font-label">متوسط</span>
+      <button class="font-btn" id="font-up"   aria-label="تكبير الخط">أ+</button>
     </div>
   </div>
 </header>
