@@ -3,7 +3,7 @@ name: Deploy to Cloudflare Pages
 on:
   push:
     branches:
-      - master
+      - main
 
 jobs:
   deploy:
@@ -21,7 +21,7 @@ jobs:
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: b35de32e9a5e46823de2ba88d1452c93
-          projectName: athkarr
+          projectName: athkarr-staging
           directory: .
-          branch: master
+          branch: main
           gitHubToken: ${{ secrets.GITHUB_TOKEN }}
