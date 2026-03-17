@@ -1170,7 +1170,7 @@ function handlePWAInstall() {
       deferredInstallPrompt = null;
       var btn = document.getElementById('pwa-install-btn');
       if (btn) btn.classList.remove('visible');
-    });
+    }).catch(function() { deferredInstallPrompt = null; });
   } else if (isIOS && !isInStandaloneMode) {
     openIOSGuide();
   }
